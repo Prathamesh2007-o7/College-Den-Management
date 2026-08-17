@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Den entry</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="court-lines" aria-hidden="true">
+    <div class="line line--outer"></div>
+    <div class="line line--net"></div>
+    <div class="line line--service-top"></div>
+    <div class="line line--service-bottom"></div>
+    <div class="line line--center"></div>
+  </div>
+
+  <button id="admin-btn" class="admin-btn" type="button">Admin</button>
+
+  <main class="kiosk">
+    <header class="kiosk__header">
+      <span class="kiosk__eyebrow">The Den</span>
+      <h1 class="kiosk__title">Entry check</h1>
+      <p class="kiosk__subtitle">Scan in with your roll number before you play</p>
+    </header>
+
+    <form id="entry-form" class="kiosk__form" autocomplete="off">
+      <label for="roll_number" class="kiosk__label">Roll number</label>
+      <input
+        id="roll_number"
+        name="roll_number"
+        class="kiosk__input"
+        type="text"
+        placeholder="e.g. CS2024001"
+        inputmode="text"
+        autofocus
+      >
+      <button type="submit" class="kiosk__button">Check in</button>
+    </form>
+
+    <section id="result" class="result" data-state="idle" aria-live="polite">
+      <span class="result__status">Waiting for roll number</span>
+      <span class="result__reason"></span>
+    </section>
+  </main>
+
+  <div id="admin-modal" class="modal" hidden>
+    <div class="modal__backdrop" id="modal-backdrop"></div>
+    <div class="modal__panel">
+      <button id="modal-close" class="modal__close" type="button" aria-label="Close">&times;</button>
+
+      <div id="admin-login-view">
+        <span class="kiosk__eyebrow">Admin</span>
+        <h2 class="modal__title">Enter password</h2>
+        <form id="admin-form" autocomplete="off">
+          <input
+            id="admin-password"
+            class="kiosk__input"
+            type="password"
+            placeholder="Password"
+            autocomplete="current-password"
+          >
+          <button type="submit" class="kiosk__button">View logs</button>
+        </form>
+        <p id="admin-error" class="modal__error"></p>
+      </div>
+
+      <div id="admin-logs-view" hidden>
+        <span class="kiosk__eyebrow">Admin</span>
+        <h2 class="modal__title">Den entry log</h2>
+        <div class="log-table-wrap">
+          <table class="log-table">
+            <thead>
+              <tr>
+                <th>Time</th>
+                <th>Roll No</th>
+                <th>Name</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="log-table-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
