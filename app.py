@@ -1,8 +1,13 @@
+import os
 from flask import Flask, jsonify, render_template, request
 from db import connection
 import chk_access
 
 app = Flask(__name__)
+
+# Admin password for viewing the entry log. Reads from an env var if set,
+# otherwise falls back to the value you gave.
+ADMIN_PASSWORD = os.getenv("DEN_ADMIN_PASSWORD", "Pratham@2007")
 
 
 @app.route("/", methods=["GET"])
@@ -59,6 +64,44 @@ def check_entry():
         })
     except Exception as exc:
         connection.rollback()
+        return jsonify({
+            "status": "ERROR",
+            "message": "Database error",
+            "reason": str(exc)
+        }), 500
+    finally:
+        cursor.close()
+
+
+@app.route("/admin/logs", methods=["POST"])
+def admin_logs():
+    data = request.get_json(silent=True) or {}
+    password = data.get("password") or ""
+
+    if password != ADMIN_PASSWORD:
+        return jsonify({
+            "status": "ERROR",
+            "message": "Incorrect password"
+        }), 401
+
+    if not connection.is_connected():
+        connection.reconnect(attempts=3, delay=2)
+
+    cursor = connection.cursor()
+    try:
+        rows = chk_access.get_all_logs(cursor)
+        logs = [
+            {
+                "id": row[0],
+                "roll_no": row[1],
+                "name": row[2] or "Unknown",
+                "status": row[3],
+                "entry_time": row[4].strftime("%Y-%m-%d %H:%M:%S") if row[4] else None
+            }
+            for row in rows
+        ]
+        return jsonify({"status": "OK", "logs": logs})
+    except Exception as exc:
         return jsonify({
             "status": "ERROR",
             "message": "Database error",
