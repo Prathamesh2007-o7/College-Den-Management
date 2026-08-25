@@ -3,78 +3,204 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Den entry</title>
+  <title>The Den — Entry & Activities</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-  <div class="court-lines" aria-hidden="true">
-    <div class="line line--outer"></div>
-    <div class="line line--net"></div>
-    <div class="line line--service-top"></div>
-    <div class="line line--service-bottom"></div>
-    <div class="line line--center"></div>
+  <!-- Ambient Cosmic Background -->
+  <div class="ambient" aria-hidden="true">
+    <div class="ambient__orb ambient__orb--1"></div>
+    <div class="ambient__orb ambient__orb--2"></div>
+    <div class="ambient__orb ambient__orb--3"></div>
+    <div class="ambient__noise"></div>
   </div>
 
-  <button id="admin-btn" class="admin-btn" type="button">Admin</button>
+  <button id="admin-btn" class="admin-btn" type="button">
+    <span class="admin-btn__icon">⚙</span>
+    Admin
+  </button>
 
   <main class="kiosk">
+    <div class="kiosk__border-shine" aria-hidden="true"></div>
+
     <header class="kiosk__header">
-      <span class="kiosk__eyebrow">The Den</span>
-      <h1 class="kiosk__title">Entry check</h1>
-      <p class="kiosk__subtitle">Scan in with your roll number before you play</p>
+      <div class="kiosk__brand">
+        <span class="kiosk__logo"></span>
+        <span class="kiosk__eyebrow">The Den</span>
+      </div>
+      <h1 class="kiosk__title">Entry Check</h1>
+      <p class="kiosk__subtitle">Authenticate with your roll number to begin</p>
     </header>
 
+    <!-- Step 1: Scan Roll Number -->
     <form id="entry-form" class="kiosk__form" autocomplete="off">
       <label for="roll_number" class="kiosk__label">Roll number</label>
-      <input
-        id="roll_number"
-        name="roll_number"
-        class="kiosk__input"
-        type="text"
-        placeholder="e.g. CS2024001"
-        inputmode="text"
-        autofocus
-      >
-      <button type="submit" class="kiosk__button">Check in</button>
+      <div class="input-wrap">
+        <input id="roll_number" name="roll_number" class="kiosk__input" type="text" placeholder="e.g. CS2024001" autofocus>
+      </div>
+      <button type="submit" class="kiosk__button">
+        <span>Check in</span>
+        <span class="kiosk__button-arrow">→</span>
+      </button>
     </form>
 
+    <!-- Step 2: Active Session / Check Out UI -->
+    <div id="checkout-step" class="kiosk__form" hidden>
+      <div class="session-info-card">
+        <div class="session-info-card__header">
+          <span class="session-dot"></span>
+          <span class="kiosk__eyebrow" id="active-student-name">Student</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Activity</span>
+          <strong id="active-activity-name">-</strong>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Time Left</span>
+          <strong id="active-time-left" class="highlight-text">-</strong>
+        </div>
+      </div>
+      <button type="button" id="checkout-btn" class="kiosk__button kiosk__button--danger">
+        End Session & Check Out
+      </button>
+      <button type="button" class="option-btn back-btn">← Back</button>
+    </div>
+
+    <!-- Step 3: Choose Action -->
+    <div id="action-selection-step" class="kiosk__form" hidden>
+      <label class="kiosk__label">Select an activity</label>
+      <div class="options-grid options-grid--2col">
+        <button type="button" class="option-btn" data-action="activity" data-value="Table Tennis">
+          <span class="option-btn__icon">🏓</span>
+          <span class="option-btn__text">
+            <span class="option-btn__title">Table Tennis</span>
+            <span class="option-btn__meta">Limit: 2</span>
+          </span>
+        </button>
+        <button type="button" class="option-btn" data-action="activity" data-value="Carrom">
+          <span class="option-btn__icon">🎯</span>
+          <span class="option-btn__text">
+            <span class="option-btn__title">Carrom</span>
+            <span class="option-btn__meta">Limit: 12</span>
+          </span>
+        </button>
+        <button type="button" class="option-btn" data-action="activity" data-value="Chess">
+          <span class="option-btn__icon">♟️</span>
+          <span class="option-btn__text">
+            <span class="option-btn__title">Chess</span>
+            <span class="option-btn__meta">Limit: 4</span>
+          </span>
+        </button>
+        <button type="button" class="option-btn" data-action="activity" data-value="PC Gaming">
+          <span class="option-btn__icon">🖥️</span>
+          <span class="option-btn__text">
+            <span class="option-btn__title">PC Gaming</span>
+            <span class="option-btn__meta">Limit: 6</span>
+          </span>
+        </button>
+        <button type="button" class="option-btn" data-action="activity" data-value="PS5 Gaming">
+          <span class="option-btn__icon">🎮</span>
+          <span class="option-btn__text">
+            <span class="option-btn__title">PS5 Gaming</span>
+            <span class="option-btn__meta">Limit: 4</span>
+          </span>
+        </button>
+        <button type="button" class="option-btn" data-action="activity" data-value="Air Hockey">
+          <span class="option-btn__icon">🏒</span>
+          <span class="option-btn__text">
+            <span class="option-btn__title">Air Hockey</span>
+            <span class="option-btn__meta">Limit: 2</span>
+          </span>
+        </button>
+      </div>
+      <button type="button" class="option-btn option-btn--highlight" data-action="rent-mode">
+        <span class="option-btn__icon">📦</span>
+        <span class="option-btn__text">
+          <span class="option-btn__title">Rent Equipment</span>
+          <span class="option-btn__meta">Balls, Rackets & Gear</span>
+        </span>
+      </button>
+      <button type="button" class="option-btn back-btn">← Cancel</button>
+    </div>
+
+    <!-- Step 4: Equipment Selection -->
+    <div id="equipment-selection-step" class="kiosk__form" hidden>
+      <label class="kiosk__label">Select Equipment</label>
+      <div class="options-grid">
+        <button type="button" class="equip-btn" data-item="Basketball">
+          <span class="option-btn__icon">🏀</span>
+          <span class="option-btn__title">Basketball</span>
+        </button>
+        <button type="button" class="equip-btn" data-item="Badminton Rackets">
+          <span class="option-btn__icon">🏸</span>
+          <span class="option-btn__title">Badminton Rackets</span>
+        </button>
+        <button type="button" class="equip-btn" data-item="Football">
+          <span class="option-btn__icon">⚽</span>
+          <span class="option-btn__title">Football</span>
+        </button>
+        <button type="button" class="equip-btn" data-item="Cricket gear">
+          <span class="option-btn__icon">🏏</span>
+          <span class="option-btn__title">Cricket gear</span>
+        </button>
+        <button type="button" class="option-btn back-btn">← Back</button>
+      </div>
+    </div>
+
+    <!-- Step 5: Duration Selection -->
+    <div id="duration-selection-step" class="kiosk__form" hidden>
+      <label class="kiosk__label">Select Rental Duration</label>
+      <div class="options-grid options-grid--duration">
+        <button type="button" class="duration-btn" data-hours="1">
+          <span class="duration-btn__num">1</span>
+          <span class="duration-btn__unit">Hour</span>
+        </button>
+        <button type="button" class="duration-btn" data-hours="2">
+          <span class="duration-btn__num">2</span>
+          <span class="duration-btn__unit">Hours</span>
+        </button>
+        <button type="button" class="duration-btn" data-hours="3">
+          <span class="duration-btn__num">3</span>
+          <span class="duration-btn__unit">Hours</span>
+        </button>
+        <button type="button" class="option-btn back-btn">← Back</button>
+      </div>
+    </div>
+
     <section id="result" class="result" data-state="idle" aria-live="polite">
-      <span class="result__status">Waiting for roll number</span>
+      <div class="result__indicator"></div>
+      <span class="result__status">Awaiting input</span>
       <span class="result__reason"></span>
     </section>
   </main>
 
+  <!-- Admin Modal -->
   <div id="admin-modal" class="modal" hidden>
     <div class="modal__backdrop" id="modal-backdrop"></div>
     <div class="modal__panel">
       <button id="modal-close" class="modal__close" type="button" aria-label="Close">&times;</button>
-
+      
       <div id="admin-login-view">
-        <span class="kiosk__eyebrow">Admin</span>
-        <h2 class="modal__title">Enter password</h2>
+        <span class="kiosk__eyebrow">System Admin</span>
+        <h2 class="modal__title">Enter Passcode</h2>
         <form id="admin-form" autocomplete="off">
-          <input
-            id="admin-password"
-            class="kiosk__input"
-            type="password"
-            placeholder="Password"
-            autocomplete="current-password"
-          >
-          <button type="submit" class="kiosk__button">View logs</button>
+          <input id="admin-password" class="kiosk__input" type="password" placeholder="Password" autocomplete="current-password">
+          <button type="submit" class="kiosk__button">Authenticate</button>
         </form>
         <p id="admin-error" class="modal__error"></p>
       </div>
 
       <div id="admin-logs-view" hidden>
-        <span class="kiosk__eyebrow">Admin</span>
-        <h2 class="modal__title">Den entry log</h2>
+        <span class="kiosk__eyebrow">Dashboard</span>
+        <h2 class="modal__title">Entry Logs</h2>
         <div class="log-table-wrap">
           <table class="log-table">
             <thead>
               <tr>
-                <th>Time</th>
+                <th>Timestamp</th>
                 <th>Roll No</th>
                 <th>Name</th>
                 <th>Status</th>
