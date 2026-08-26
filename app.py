@@ -10,7 +10,13 @@ ADMIN_PASSWORD = os.getenv("DEN_ADMIN_PASSWORD", "Pratham@2007")
 
 @app.route("/", methods=["GET"])
 def index():
+    # Serves the main student kiosk
     return render_template("temp.html")
+
+@app.route("/admin", methods=["GET"])
+def admin_page():
+    # Serves the dedicated admin dashboard
+    return render_template("admin.html")
 
 
 @app.route("/check_entry", methods=["POST"])
@@ -180,6 +186,53 @@ def admin_logs():
             for row in rows
         ]
         return jsonify({"status": "OK", "logs": logs})
+    finally:
+        cursor.close()
+
+
+@app.route("/admin/detailed_report", methods=["POST"])
+def admin_detailed_report():
+    data = request.get_json(silent=True) or {}
+    password = data.get("password") or ""
+
+    if password != ADMIN_PASSWORD:
+        return jsonify({"status": "ERROR", "message": "Incorrect password"}), 401
+
+    if not connection.is_connected():
+        connection.reconnect(attempts=3, delay=2)
+
+    cursor = connection.cursor(buffered=True)
+    try:
+        sessions_raw = chk_access.get_detailed_sessions(cursor)
+        sessions = [{
+            "roll_no": row[0],
+            "name": row[1] or "Unknown",
+            "action_type": row[2],
+            "activity_name": row[3],
+            "equipment_item": row[4],
+            "start_time": row[5].strftime("%Y-%m-%d %H:%M:%S") if row[5] else None,
+            "status": row[6]
+        } for row in sessions_raw]
+
+        monthly_raw = chk_access.get_monthly_visitors(cursor)
+        monthly_stats = [{"month": row[0], "total_visits": row[1]} for row in monthly_raw]
+
+        student_monthly_raw = chk_access.get_student_monthly_visits(cursor)
+        student_monthly_stats = [{
+            "roll_no": row[0],
+            "name": row[1] or "Unknown",
+            "month": row[2],
+            "visits": row[3]
+        } for row in student_monthly_raw]
+
+        return jsonify({
+            "status": "OK",
+            "sessions": sessions,
+            "monthly_stats": monthly_stats,
+            "student_monthly_stats": student_monthly_stats
+        })
+    except Exception as exc:
+        return jsonify({"status": "ERROR", "message": "Server error", "reason": str(exc)}), 500
     finally:
         cursor.close()
 
