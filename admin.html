@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Den Analytics &amp; Logs</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="background" aria-hidden="true"></div>
+  <a href="/" class="admin-btn">← Back to kiosk</a>
+
+  <main class="card admin-login kiosk" id="admin-login-view">
+    <div class="logo"><span class="logo-mark">⌘</span><span class="logo-text">VIT</span></div>
+    <h1 class="title">Admin Access</h1>
+    <p class="subtitle">Enter your password to view Den analytics and logs.</p>
+    <form id="admin-form" class="kiosk__form" autocomplete="off">
+      <label class="sr-only" for="admin-password">Password</label>
+      <div class="input-wrapper"><span class="input-icon" aria-hidden="true">🔒</span><input id="admin-password" class="roll-input kiosk__input" type="password" placeholder="Password" autocomplete="current-password" autofocus></div>
+      <button type="submit" class="checkin-btn kiosk__button">Verify &amp; Enter</button>
+    </form>
+    <p id="admin-error" class="admin-error" aria-live="polite"></p>
+  </main>
+
+  <main class="analytics-panel dashboard" id="admin-dashboard-view" hidden>
+    <header class="panel-header dashboard__header">
+      <h1 class="panel-title">Den Analytics &amp; Logs</h1>
+      <div class="panel-actions admin-tabs" role="tablist">
+        <button id="tab-basic-logs" class="log-btn admin-tab active" type="button">Basic Logs</button>
+        <button id="tab-detailed-report" class="log-btn admin-tab" type="button">Detailed Report</button>
+      </div>
+    </header>
+    <div class="panel-content">
+      <section id="view-basic-logs">
+        <h2 class="section-title">General Entry Logs</h2>
+        <div class="log-table-wrap"><table class="log-table"><thead><tr><th>Timestamp</th><th>Roll No</th><th>Name</th><th>Status</th></tr></thead><tbody id="log-table-body"></tbody></table></div>
+      </section>
+      <section id="view-detailed-report" hidden>
+        <h2 class="section-title">Monthly Total Visitors</h2>
+        <div class="log-table-wrap"><table class="log-table"><thead><tr><th>Month</th><th>Total Entry Visits</th></tr></thead><tbody id="report-monthly-body"></tbody></table></div>
+        <h2 class="section-title">Student Monthly Visits</h2>
+        <div class="log-table-wrap"><table class="log-table"><thead><tr><th>Roll No</th><th>Name</th><th>Month</th><th>Total Visits</th></tr></thead><tbody id="report-student-monthly-body"></tbody></table></div>
+        <h2 class="section-title">Session &amp; Equipment Details</h2>
+        <div class="log-table-wrap"><table class="log-table"><thead><tr><th>Start Time</th><th>Roll No</th><th>Name</th><th>Action</th><th>Item/Activity</th><th>Status</th></tr></thead><tbody id="report-sessions-body"></tbody></table></div>
+      </section>
+    </div>
+  </main>
+  <script src="{{ url_for('static', filename='admin.js') }}"></script>
+</body>
+</html>
