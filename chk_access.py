@@ -1,5 +1,4 @@
-from datetime import datetime
-
+from datetime import datetime, timedelta
 
 def get_student(cursor, roll_number):
     """Look up a student by roll number. Returns (roll_no, name, department_id) or None."""
@@ -8,7 +7,6 @@ def get_student(cursor, roll_number):
         (roll_number,)
     )
     return cursor.fetchone()
-
 
 def get_clashing_lecture(cursor, department_id, now=None):
     """
@@ -33,14 +31,12 @@ def get_clashing_lecture(cursor, department_id, now=None):
     )
     return cursor.fetchone()
 
-
 def log_entry(cursor, roll_number, status):
     """Record an entry attempt in den_entry_log."""
     cursor.execute(
         "INSERT INTO den_entry_log (roll_no, status) VALUES (%s, %s)",
         (roll_number, status)
     )
-
 
 def get_all_logs(cursor):
     """Fetch every entry log, newest first, joined with the student's name."""
@@ -88,7 +84,6 @@ def check_and_occupy_activity(cursor, roll_no, activity_name):
     )
     return True, f"Slot confirmed for {activity_name} ({current_count + 1}/{max_cap})"
 
-
 def record_equipment_rental(cursor, roll_no, item_name, duration):
     """Records an equipment rental session with selected duration."""
     cursor.execute(
@@ -99,22 +94,6 @@ def record_equipment_rental(cursor, roll_no, item_name, duration):
         (roll_no, item_name, duration)
     )
     return True, f"Rented {item_name} for {duration} Hour(s)."
-
-def get_active_session(cursor, roll_no):
-    """Checks if the student currently has an active activity or rental session."""
-    cursor.execute(
-        """
-        SELECT action_type, activity_name, equipment_item
-        FROM activity_session
-        WHERE roll_no = %s AND status = 'ACTIVE'
-        ORDER BY start_time DESC
-        LIMIT 1
-        """,
-        (roll_no,)
-    )
-    return cursor.fetchone()
-
-from datetime import datetime, timedelta
 
 def get_active_session(cursor, roll_no):
     """Fetches active session details and computes time left in minutes."""
@@ -180,3 +159,40 @@ def checkout_session(cursor, roll_no):
     )
     return True, f"Successfully checked out from {session['label']}."
 
+
+# ==========================================
+# REPORTING QUERIES (New Features)
+# ==========================================
+
+def get_detailed_sessions(cursor):
+    """Fetches details on what equipment/activity a student engaged with."""
+    cursor.execute("""
+        SELECT a.roll_no, s.name, a.action_type, a.activity_name, a.equipment_item, a.start_time, a.status
+        FROM activity_session a
+        LEFT JOIN student s ON a.roll_no = s.roll_no
+        ORDER BY a.start_time DESC
+    """)
+    return cursor.fetchall()
+
+def get_monthly_visitors(cursor):
+    """Calculates total allowed entry log counts grouped by Month-Year."""
+    cursor.execute("""
+        SELECT DATE_FORMAT(entry_time, '%Y-%m') AS month, COUNT(id) AS total_visits
+        FROM den_entry_log
+        WHERE status = 'ALLOWED'
+        GROUP BY month
+        ORDER BY month DESC
+    """)
+    return cursor.fetchall()
+
+def get_student_monthly_visits(cursor):
+    """Calculates entry counts per individual student grouped by Month-Year."""
+    cursor.execute("""
+        SELECT s.roll_no, s.name, DATE_FORMAT(d.entry_time, '%Y-%m') AS month, COUNT(d.id) AS visits
+        FROM den_entry_log d
+        LEFT JOIN student s ON d.roll_no = s.roll_no
+        WHERE d.status = 'ALLOWED'
+        GROUP BY s.roll_no, s.name, month
+        ORDER BY month DESC, visits DESC
+    """)
+    return cursor.fetchall()
