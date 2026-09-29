@@ -45,15 +45,12 @@ function resetFlow() {
 document.querySelectorAll(".back-btn").forEach(btn => {
   btn.addEventListener("click", () => {
     if (!durationStep.hidden) {
-      // Step 4 (Duration) -> Step 3 (Equipment Selection)
       durationStep.hidden = true;
       equipStep.hidden = false;
     } else if (!equipStep.hidden) {
-      // Step 3 (Equipment) -> Step 2 (Activity Selection)
       equipStep.hidden = true;
       actionStep.hidden = false;
     } else if (!actionStep.hidden || !checkoutStep.hidden) {
-      // Step 2 (Activity or Checkout) -> Step 1 (Roll Number Entry)
       resetFlow();
     }
   });
@@ -186,56 +183,3 @@ async function submitFinalAction(payload) {
     setTimeout(resetFlow, 3500);
   }
 }
-
-// Admin Modal Handlers
-const adminBtn = document.getElementById("admin-btn");
-const adminModal = document.getElementById("admin-modal");
-const modalBackdrop = document.getElementById("modal-backdrop");
-const modalClose = document.getElementById("modal-close");
-const adminForm = document.getElementById("admin-form");
-const adminPasswordInput = document.getElementById("admin-password");
-const adminError = document.getElementById("admin-error");
-const adminLoginView = document.getElementById("admin-login-view");
-const adminLogsView = document.getElementById("admin-logs-view");
-const logTableBody = document.getElementById("log-table-body");
-
-adminBtn.addEventListener("click", () => {
-  adminModal.hidden = false;
-  adminLoginView.hidden = false;
-  adminLogsView.hidden = true;
-  adminError.textContent = "";
-  adminPasswordInput.value = "";
-  adminPasswordInput.focus();
-});
-
-const closeModal = () => (adminModal.hidden = true);
-modalClose.addEventListener("click", closeModal);
-modalBackdrop.addEventListener("click", closeModal);
-
-adminForm.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  try {
-    const res = await fetch("/admin/logs", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ password: adminPasswordInput.value })
-    });
-    const data = await res.json();
-    if (res.ok && data.status === "OK") {
-      adminLoginView.hidden = true;
-      adminLogsView.hidden = false;
-      logTableBody.innerHTML = data.logs.map(log => `
-        <tr>
-          <td>${log.entry_time || "-"}</td>
-          <td>${log.roll_no}</td>
-          <td>${log.name}</td>
-          <td class="${log.status === "ALLOWED" ? "status-allowed" : "status-denied"}">${log.status}</td>
-        </tr>
-      `).join("");
-    } else {
-      adminError.textContent = data.message || "Incorrect password";
-    }
-  } catch {
-    adminError.textContent = "Could not reach server";
-  }
-});
