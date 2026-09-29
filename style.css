@@ -556,3 +556,17 @@ input {
         text-align: left;
     }
 }
+
+/* Download Excel button — visually distinct from the tab toggles */
+.download-btn {
+    margin-left: auto;
+    background: rgba(139, 197, 63, 0.14);
+    border-color: rgba(139, 197, 63, 0.4);
+    color: #b7e37f;
+}
+
+.download-btn:hover {
+    background: #8bc53f;
+    border-color: #8bc53f;
+    color: #10200c;
+}
