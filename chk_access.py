@@ -160,10 +160,6 @@ def checkout_session(cursor, roll_no):
     return True, f"Successfully checked out from {session['label']}."
 
 
-# ==========================================
-# REPORTING QUERIES (New Features)
-# ==========================================
-
 def get_detailed_sessions(cursor):
     """Fetches details on what equipment/activity a student engaged with."""
     cursor.execute("""
