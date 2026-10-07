@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Den Dashboard</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="background" aria-hidden="true"></div>
+  <a href="/" class="admin-btn">← Back to Kiosk</a>
+
+  <!-- Login Screen -->
+  <main class="card kiosk" id="admin-login-view">
+    <div class="logo"><span class="logo-mark">⌘</span><span class="logo-text">VIT</span></div>
+    <h1 class="title">Dashboard Access</h1>
+    <p class="subtitle">Enter your password to access the Den dashboard.</p>
+    <form id="admin-form" class="kiosk__form" autocomplete="off">
+      <label class="sr-only" for="admin-password">Password</label>
+      <div class="input-wrapper"><span class="input-icon" aria-hidden="true">🔒</span><input id="admin-password" class="roll-input kiosk__input" type="password" placeholder="Password" autocomplete="current-password" autofocus></div>
+      <button type="submit" class="checkin-btn kiosk__button">Verify &amp; Enter</button>
+    </form>
+    <p id="admin-error" class="admin-error" aria-live="polite"></p>
+  </main>
+
+  <!-- Dashboard Main Menu -->
+  <main class="card dash-menu" id="dashboard-menu-view" hidden>
+    <div class="logo"><span class="logo-mark">⌘</span><span class="logo-text">VIT</span></div>
+    <h1 class="title">Dashboard <span class="controller-icon" aria-hidden="true">📊</span></h1>
+    <p class="subtitle">Select an option to continue:</p>
+    <div class="kiosk__form">
+      <button type="button" class="option-btn dash-menu-btn" id="menu-view-logs">
+        <span>📋</span><span><b>View Logs</b><small>Entry logs &amp; basic records</small></span>
+      </button>
+      <button type="button" class="option-btn dash-menu-btn" id="menu-view-detailed">
+        <span>📈</span><span><b>View Detailed Logs</b><small>Sessions, monthly stats &amp; reports</small></span>
+      </button>
+      <button type="button" class="option-btn dash-menu-btn option-btn--highlight" id="menu-update-db">
+        <span>🗄️</span><span><b>Update Database</b><small>Timetable, students &amp; departments</small></span>
+      </button>
+    </div>
+  </main>
+
+  <!-- View: Basic Logs -->
+  <main class="analytics-panel dashboard" id="view-basic-logs" hidden>
+    <header class="panel-header dashboard__header">
+      <h1 class="panel-title">Entry Logs</h1>
+      <div class="panel-actions">
+        <button type="button" class="log-btn" id="logs-back-btn">← Dashboard</button>
+        <button type="button" id="download-csv-btn" class="log-btn download-btn">Download Excel</button>
+      </div>
+    </header>
+    <div class="panel-content">
+      <h2 class="section-title">General Entry Logs</h2>
+      <div class="log-table-wrap"><table class="log-table"><thead><tr><th>Timestamp</th><th>Roll No</th><th>Name</th><th>Status</th></tr></thead><tbody id="log-table-body"></tbody></table></div>
+    </div>
+  </main>
+
+  <!-- View: Detailed Report -->
+  <main class="analytics-panel dashboard" id="view-detailed-report" hidden>
+    <header class="panel-header dashboard__header">
+      <h1 class="panel-title">Detailed Reports</h1>
+      <div class="panel-actions">
+        <button type="button" class="log-btn" id="detailed-back-btn">← Dashboard</button>
+        <button type="button" id="download-detailed-csv-btn" class="log-btn download-btn">Download Excel</button>
+      </div>
+    </header>
+    <div class="panel-content">
+      <h2 class="section-title">Monthly Total Visitors</h2>
+      <div class="log-table-wrap"><table class="log-table"><thead><tr><th>Month</th><th>Total Entry Visits</th></tr></thead><tbody id="report-monthly-body"></tbody></table></div>
+      <h2 class="section-title">Student Monthly Visits</h2>
+      <div class="log-table-wrap"><table class="log-table"><thead><tr><th>Roll No</th><th>Name</th><th>Month</th><th>Total Visits</th></tr></thead><tbody id="report-student-monthly-body"></tbody></table></div>
+      <h2 class="section-title">Session &amp; Equipment Details</h2>
+      <div class="log-table-wrap"><table class="log-table"><thead><tr><th>Start Time</th><th>Roll No</th><th>Name</th><th>Action</th><th>Item/Activity</th><th>Status</th></tr></thead><tbody id="report-sessions-body"></tbody></table></div>
+    </div>
+  </main>
+
+  <!-- View: Update Database -->
+  <main class="analytics-panel dashboard" id="view-update-db" hidden>
+    <header class="panel-header dashboard__header">
+      <h1 class="panel-title">Update Database</h1>
+      <div class="panel-actions">
+        <button type="button" class="log-btn" id="update-back-btn">← Dashboard</button>
+      </div>
+    </header>
+    <div class="panel-content update-db-content">
+
+      <!-- Sub-tabs -->
+      <div class="update-tabs" role="tablist">
+        <button class="log-btn admin-tab active" id="tab-timetable" type="button">Timetable</button>
+        <button class="log-btn admin-tab" id="tab-students" type="button">Students</button>
+        <button class="log-btn admin-tab" id="tab-departments" type="button">Departments</button>
+      </div>
+
+      <!-- Timetable Section -->
+      <section id="section-timetable">
+        <h2 class="section-title">Add / Update Timetable Entry</h2>
+        <form id="form-timetable" class="db-form" autocomplete="off">
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="tt-dept-id">Department ID</label>
+              <input id="tt-dept-id" type="number" class="db-input" placeholder="e.g. 1" required>
+            </div>
+            <div class="form-group">
+              <label for="tt-day">Day of Week</label>
+              <select id="tt-day" class="db-input" required>
+                <option value="">Select day</option>
+                <option>Monday</option><option>Tuesday</option><option>Wednesday</option>
+                <option>Thursday</option><option>Friday</option><option>Saturday</option><option>Sunday</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="tt-start">Start Time</label>
+              <input id="tt-start" type="time" class="db-input" required>
+            </div>
+            <div class="form-group">
+              <label for="tt-end">End Time</label>
+              <input id="tt-end" type="time" class="db-input" required>
+            </div>
+            <div class="form-group form-group--full">
+              <label for="tt-subject">Subject</label>
+              <input id="tt-subject" type="text" class="db-input" placeholder="e.g. Data Structures" required>
+            </div>
+          </div>
+          <button type="submit" class="checkin-btn kiosk__button form-submit-btn">Add Timetable Entry</button>
+        </form>
+        <p id="tt-status" class="form-status" aria-live="polite"></p>
+
+        <h2 class="section-title">Current Timetable</h2>
+        <div class="log-table-wrap"><table class="log-table"><thead><tr><th>ID</th><th>Dept ID</th><th>Day</th><th>Start</th><th>End</th><th>Subject</th><th>Action</th></tr></thead><tbody id="timetable-body"></tbody></table></div>
+      </section>
+
+      <!-- Students Section -->
+      <section id="section-students" hidden>
+        <h2 class="section-title">Add / Update Student</h2>
+        <form id="form-student" class="db-form" autocomplete="off">
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="st-roll">Roll Number</label>
+              <input id="st-roll" type="text" class="db-input" placeholder="e.g. CS2024001" required>
+            </div>
+            <div class="form-group">
+              <label for="st-name">Student Name</label>
+              <input id="st-name" type="text" class="db-input" placeholder="e.g. John Doe" required>
+            </div>
+            <div class="form-group">
+              <label for="st-dept">Department ID</label>
+              <input id="st-dept" type="number" class="db-input" placeholder="e.g. 1" required>
+            </div>
+          </div>
+          <button type="submit" class="checkin-btn kiosk__button form-submit-btn">Add / Update Student</button>
+        </form>
+        <p id="st-status" class="form-status" aria-live="polite"></p>
+
+        <h2 class="section-title">Current Students</h2>
+        <div class="log-table-wrap"><table class="log-table"><thead><tr><th>Roll No</th><th>Name</th><th>Dept ID</th><th>Action</th></tr></thead><tbody id="students-body"></tbody></table></div>
+      </section>
+
+      <!-- Departments Section -->
+      <section id="section-departments" hidden>
+        <h2 class="section-title">Add Department</h2>
+        <form id="form-department" class="db-form" autocomplete="off">
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="dp-name">Department Name</label>
+              <input id="dp-name" type="text" class="db-input" placeholder="e.g. Computer Engineering" required>
+            </div>
+          </div>
+          <button type="submit" class="checkin-btn kiosk__button form-submit-btn">Add Department</button>
+        </form>
+        <p id="dp-status" class="form-status" aria-live="polite"></p>
+
+        <h2 class="section-title">Current Departments</h2>
+        <div class="log-table-wrap"><table class="log-table"><thead><tr><th>ID</th><th>Department Name</th><th>Action</th></tr></thead><tbody id="departments-body"></tbody></table></div>
+      </section>
+
+    </div>
+  </main>
+
+  <script src="{{ url_for('static', filename='admin.js') }}"></script>
+</body>
+</html>
